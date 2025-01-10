@@ -1,38 +1,24 @@
-/*
-    get_random.js
+import 'dotenv/config'
 
-    MediaWiki API Demos
-    Demo of `Random` module: Get request to list 5 random pages.
+// Get today's featured article from English Wikipedia
 
-    MIT License
-*/
+async function getFeaturedArticles() {
+    let today = new Date();
+    let year = today.getFullYear();
+    let month = String(today.getMonth() + 1).padStart(2,'0');
+    let day = String(today.getDate()).padStart(2,'0');
+    let url = `https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${year}/${month}/${day}`;
 
-function get_random(){
-    var url = "https://en.wikipedia.org/w/api.php"; 
-
-    var params = {
-        action: "query",
-        format: "json",
-        list: "random",
-        rnlimit: "2",
-        rnnamespace : "0"
-    };
-    
-    url = url + "?origin=*";
-    Object.keys(params).forEach(function(key){url += "&" + key + "=" + params[key];});
-    
-    fetch(url)
-        .then(function(response){return response.json();})
-        .then(function(response) {
-            var randoms = response.query.random;
-            for (var r in randoms) {
-                console.log(randoms[r].title);
+    let response = await fetch( url,
+        {
+            headers: {
+                'Authorization': process.env.ACCESS_TOKEN,
+                'Api-User-Agent': "Test"
             }
-            document.getElementById("start").textContent = randoms[0].title;
-            document.getElementById("end").textContent = randoms[1].title;
-        })
-        .catch(function(error){console.log(error);})
+        }
+    );
+    response.json()
+        .then(console.log).catch(console.error);
 }
 
-get_random();
-document.getElementById("change").onclick = get_random;
+getFeaturedArticles();

@@ -1,0 +1,24 @@
+{
+  "name": "wikipedia-game",
+  "version": "1.0.0",
+  "description": "This is a wikipedia game google extension",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Harrish92/Wikipedia-Game.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Harrish92/Wikipedia-Game/issues"
+  },
+  "homepage": "https://github.com/Harrish92/Wikipedia-Game#readme",
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  }
+}
