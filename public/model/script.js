@@ -1,4 +1,4 @@
-import 'dotenv/config'
+require('dotenv/config')
 
 // Get today's featured article from English Wikipedia
 
