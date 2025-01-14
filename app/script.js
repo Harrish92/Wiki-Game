@@ -17,8 +17,19 @@ async function getFeaturedArticles() {
             }
         }
     );
+
     response.json()
-        .then(console.log).catch(console.error);
+        .then(function(result) {
+            const obj = JSON.parse(JSON.stringify(result));
+
+            let begin = Math.floor(Math.random() * obj.mostread.articles.length);
+            let end = Math.floor(Math.random() * obj.mostread.articles.length);
+
+            console.log(obj.mostread.articles[begin].normalizedtitle);
+            console.log(obj.mostread.articles[end].normalizedtitle);
+
+        }).catch(console.error);
+    
 }
 
 getFeaturedArticles();
