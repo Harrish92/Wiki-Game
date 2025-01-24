@@ -1,13 +1,24 @@
+let findElement = document.getElementById("find");
+let responseElement = document.getElementById("end");
+
+
+chrome.storage.local.get('title', function (data) {
+    if (data && data.title) {
+        let parsedData = JSON.parse(data.title);
+        findElement.innerText = "find: ";
+        responseElement.innerText = `${parsedData.normalizedtitle}`;
+        responseElement.href = `https://en.wikipedia.org/wiki/${parsedData.title}`;
+    }
+});
 
 document.addEventListener("DOMContentLoaded", function () {
     const fetchBtn = document.getElementById("fetchBtn");
-    let findElement = document.getElementById("find");
-    let responseElement = document.getElementById("end");
     fetchBtn.addEventListener("click", async function () {
         const completion = await getFeaturedArticles();
         findElement.innerText = "find: ";
         responseElement.innerText = `${completion.normalizedtitle}`;
         responseElement.href = `https://en.wikipedia.org/wiki/${completion.title}`;
+        chrome.storage.local.set({ 'title': JSON.stringify(completion) });
     });
 });
 
@@ -22,7 +33,7 @@ async function getFeaturedArticles() {
     try {
         let response = await fetch(url, {
             headers: {
-                'Authorization': process.env.ACCESS_TOKEN,
+                'Authorization': Process.env.ACCESS_TOKEN,
                 'Api-User-Agent': "Test"
             }
         });
