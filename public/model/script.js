@@ -4,23 +4,22 @@ const fetchBtn = document.getElementById("fetchBtn");
 const startBtn = document.getElementById("startBtn");
 
 
-chrome.storage.local.get('title', function (data) {
-
-    if (data && data.title) {
-        let parsedData = JSON.parse(data.title);
-        findElement.innerText = "find: ";
-        responseElement.innerText = `${parsedData.normalizedtitle}`;
-        responseElement.href = `https://en.wikipedia.org/wiki/${parsedData.title}`;
-        startBtn.disabled = false;
-    } else {
-        findElement.innerText = "find: ";
-        responseElement.innerText = "";
-        responseElement.href = "";
-        startBtn.disabled = true;
-    }
-});
-
 document.addEventListener("DOMContentLoaded", function () {
+
+    chrome.storage.local.get('end', function (data) {
+        if (data && data.end) {
+            let parsedData = JSON.parse(data.end);
+            findElement.innerText = "find: ";
+            responseElement.innerText = `${parsedData.normalizedtitle}`;
+            responseElement.href = `https://en.wikipedia.org/wiki/${parsedData.title}`;
+            startBtn.disabled = false;
+        } else {
+            findElement.innerText = "";
+            responseElement.innerText = "";
+            responseElement.href = "";
+            startBtn.disabled = true;
+        }
+    });
 
     fetchBtn.addEventListener("click", async function () {
         const end = await getFeaturedArticles();
@@ -34,14 +33,22 @@ document.addEventListener("DOMContentLoaded", function () {
             findElement.innerText = "find: ";
             responseElement.innerText = `${end.normalizedtitle}`;
             responseElement.href = `https://en.wikipedia.org/wiki/${end.title}`;
-            chrome.storage.local.set({ 'title': JSON.stringify(end) });
+            chrome.storage.local.set({ 'end': JSON.stringify(end) });
             startBtn.disabled = false;
         }
     });
 
     startBtn.addEventListener("click", async function () {
-        const start = await getFeaturedArticles();
-        window.open(`https://en.wikipedia.org/wiki/${start.title}`, "_blank");
+        let start;
+        chrome.storage.local.get('start', async function(data) {
+            if (data && data.start) {
+                start = JSON.parse(data.start);
+            } else {
+                start = await getFeaturedArticles();
+                chrome.storage.local.set({ 'start': JSON.stringify(start) });
+            }
+            window.open(`https://en.wikipedia.org/wiki/${start.title}`, "_blank");
+        });
     });
 
 });
@@ -58,7 +65,7 @@ async function getFeaturedArticles() {
     try {
         let response = await fetch(url, {
             headers: {
-                'Authorization': procees.env.ACCESS_TOKEN,
+                'Authorization': Process.env.ACCESS_TOKEN,
                 'Api-User-Agent': "Test"
             }
         });
