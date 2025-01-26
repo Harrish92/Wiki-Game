@@ -22,8 +22,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     fetchBtn.addEventListener("click", async function () {
-        const end = await getFeaturedArticles();
         chrome.storage.local.clear();
+        const end = await getFeaturedArticles();
         if (end === "Error fetching article") {
             findElement.innerText = "Error fetching article";
             responseElement.innerText = "";

@@ -3,7 +3,10 @@
     "name": "Wikipedia Extension",
     "version": "1.0",
     "description": "A simple Chrome extension for Wikipedia.",
-    "permissions": ["activeTab", "scripting", "storage"],
+    "permissions": ["tabs", "scripting", "storage"],
+    "background": {
+      "service_worker": "/public/model/background.js"
+    },
     "action": {
       "default_popup": "/public/view/index.html"
     },
