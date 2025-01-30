@@ -1,63 +1,42 @@
-import { GameState, updateGameState, getGameState } from './gameState.js';
+import { GameState, updateGameState, getGameState, handleGameStep } from './gameState.js';
 
-let findElement = document.getElementById("find");
-let responseElement = document.getElementById("end");
 const fetchBtn = document.getElementById("fetchBtn");
 const startBtn = document.getElementById("startBtn");
 
-
 document.addEventListener("DOMContentLoaded", function () {
 
-    chrome.storage.local.get('end', function (data) {
-        if (data && data.end) {
-            let parsedData = JSON.parse(data.end);
-            findElement.innerText = "find: ";
-            responseElement.innerText = `${parsedData.normalizedtitle}`;
-            responseElement.href = `https://en.wikipedia.org/wiki/${parsedData.title}`;
-            startBtn.disabled = false;
-        } else {
-            findElement.innerText = "";
-            responseElement.innerText = "";
-            responseElement.href = "";
-            startBtn.disabled = true;
-        }
-    });
+    handleGameStep();
 
     fetchBtn.addEventListener("click", async function () {
-        chrome.storage.local.clear();
         const end = await getFeaturedArticles();
         if (end === "Error fetching article") {
-            findElement.innerText = "Error fetching article";
-            responseElement.innerText = "";
-            responseElement.href = "";
-            startBtn.disabled = true;
+            updateGameState(GameState.ERROR);
         } else {
-            findElement.innerText = "find: ";
-            responseElement.innerText = `${end.normalizedtitle}`;
-            responseElement.href = `https://en.wikipedia.org/wiki/${end.title}`;
+            updateGameState(GameState.SELECTION);
             chrome.storage.local.set({ 'end': JSON.stringify(end) });
-            startBtn.disabled = false;
         }
+        handleGameStep();
     });
 
     startBtn.addEventListener("click", async function () {
         let start;
-        updateGameState(GameState.PLAYING);
-        chrome.storage.local.get('start', async function(data) {
-            if (data && data.start) {
-                start = JSON.parse(data.start);
-            } else {
-                start = await getFeaturedArticles();
-                chrome.storage.local.set({ 'start': JSON.stringify(start) });
-            }
-            window.open(`https://en.wikipedia.org/wiki/${start.title}`, "_blank");
-        });
+        if (getGameState(function(step) {return step;}) === GameState.PLAYING) {
+            chrome.storage.local.get('start', function (data) {
+                if (data && data.start) {
+                    start = JSON.parse(data.start);
+                }
+            });
+        } else {
+            updateGameState(GameState.PLAYING);
+            start = await getFeaturedArticles();
+            chrome.storage.local.set({ 'start': JSON.stringify(start) });
+        }
+        window.open(`https://en.wikipedia.org/wiki/${start.title}`, "_blank");
     });
-
 });
 
 // Get today's featured article from English Wikipedia
-async function getFeaturedArticles() {
+export async function getFeaturedArticles() {
 
     let today = new Date();
     let year = today.getFullYear();

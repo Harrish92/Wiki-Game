@@ -1,10 +1,5 @@
 let matchedTitles = [];
 
-chrome.tabs.onActivated.addListener(async function(activeInfo) {
-    let tab = await chrome.tabs.get(activeInfo.tabId);
-    checkTabUrl(tab);
-});
-
 chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
     if (changeInfo.url) {
         checkTabUrl(tab);
@@ -74,6 +69,8 @@ function compareUrls(activeUrl, linkedUrls) {
         if (activeUrl === `https://en.wikipedia.org/wiki/${linkedUrl.replace(/ /g, '_')}`) {
             matchedTitles.push(linkedUrl);
             console.log("Match found! Title added to the list:", linkedUrl);
+        } else {
+            console.log("No match found.");
         }
     });
 }
