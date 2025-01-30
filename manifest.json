@@ -5,15 +5,15 @@
     "description": "A simple Chrome extension for Wikipedia.",
     "permissions": ["tabs", "scripting", "storage"],
     "background": {
-      "service_worker": "/public/model/background.js"
+      "service_worker": "/src/background.js"
     },
     "action": {
-      "default_popup": "/public/view/index.html"
+      "default_popup": "/public/index.html"
     },
     "content_scripts": [
       {
         "matches": ["*://*.wikipedia.org/*"],
-        "js": ["/public/model/script.js"]
+        "js": ["/src/script.js"]
       }
     ]
   }
