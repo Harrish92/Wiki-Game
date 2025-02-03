@@ -1,5 +1,6 @@
 import { GameState, updateGameState, getGameState, handleGameStep } from './gameState.js';
 
+
 const fetchBtn = document.getElementById("fetchBtn");
 const startBtn = document.getElementById("startBtn");
 
@@ -36,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Get today's featured article from English Wikipedia
-export async function getFeaturedArticles() {
+async function getFeaturedArticles() {
 
     let today = new Date();
     let year = today.getFullYear();
@@ -47,7 +48,7 @@ export async function getFeaturedArticles() {
     try {
         let response = await fetch(url, {
             headers: {
-                'Authorization': env.ACCESS_TOKEN,
+                'Authorization': process.env.ACCESS_TOKEN,
                 'Api-User-Agent': "Test"
             }
         });
