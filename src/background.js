@@ -18,8 +18,7 @@ async function checkTabUrl(tab) {
             if (data && data.start) {
                 let parsedData = JSON.parse(data.start);
                 titleToCheck = parsedData.title;
-                linkedUrls = await getLinkedUrls(titleToCheck);
-                compareUrls(activeUrl, linkedUrls);    
+                matchedTitles.push(titleToCheck);   
             } else {
                 console.log("No data found in local storage.");
             }
@@ -77,6 +76,7 @@ function compareUrls(activeUrl, linkedUrls) {
     });
     if (gameState !== GameState.NEXT) {
         gameState = GameState.GAME_OVER;
+        matchedTitles = [];
         console.log("Game over! No match found.");
     } else {
         gameState = GameState.PLAYING;
