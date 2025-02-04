@@ -3,6 +3,7 @@ export const GameState = {
     IDLE: 'Idle',
     SELECTION: 'Selection',
     PLAYING: 'Playing',
+    NEXT: 'Next',
     WIN: 'Win',
     GAME_OVER: 'Game Over',
     ERROR: 'Error',
@@ -65,6 +66,9 @@ export function handleGameStep() {
                         startBtn.disabled = false;
                     }
                 });
+                break;
+            case GameState.NEXT:
+                console.log('Next step...');
                 break;
             case GameState.GAME_OVER:
                 console.log('Game over!');

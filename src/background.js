@@ -1,7 +1,9 @@
+import { GameState, updateGameState, getGameState, handleGameStep } from './gameState.js';
 let matchedTitles = [];
+let gameState = getGameState(function(step) {return step;});
 
 chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
-    if (changeInfo.url) {
+    if (changeInfo.status == 'complete') {
         checkTabUrl(tab);
     }
 });
@@ -68,9 +70,16 @@ function compareUrls(activeUrl, linkedUrls) {
     linkedUrls.forEach(linkedUrl => {
         if (activeUrl === `https://en.wikipedia.org/wiki/${linkedUrl.replace(/ /g, '_')}`) {
             matchedTitles.push(linkedUrl);
+            gameState = GameState.NEXT;
+            updateGameState(gameState);
             console.log("Match found! Title added to the list:", linkedUrl);
-        } else {
-            console.log("No match found.");
         }
     });
+    if (gameState !== GameState.NEXT) {
+        gameState = GameState.GAME_OVER;
+        console.log("Game over! No match found.");
+    } else {
+        gameState = GameState.PLAYING;
+    }
+    updateGameState(gameState);
 }
