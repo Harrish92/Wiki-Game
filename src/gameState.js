@@ -34,24 +34,19 @@ export function getGameState(callback) {
 // Function to handle game steps
 export function handleGameStep() {
     let findElement = document.getElementById("find");
-    let responseElement = document.getElementById("end");
     const startBtn = document.getElementById("startBtn");
     getGameState(function(step) {
         switch (step) {
             case GameState.IDLE:
                 console.log('Game is idle...');
                 findElement.innerText = "";
-                responseElement.innerText = "";
-                responseElement.href = "";
                 startBtn.disabled = true;
                 break;
             case GameState.SELECTION:
                 chrome.storage.local.get('end', function(data) {
                     if (data && data.end) {
                         let end = JSON.parse(data.end);
-                        findElement.innerText = "find: ";
-                        responseElement.innerText = `${end.normalizedtitle}`;
-                        responseElement.href = `https://en.wikipedia.org/wiki/${end.title}`;
+                        findElement.innerText = "find: " + `${end.normalizedtitle}`;
                         startBtn.disabled = false;
                     }
                 });
@@ -60,10 +55,8 @@ export function handleGameStep() {
                 chrome.storage.local.get('end', function(data) {
                     if (data && data.end) {
                         let end = JSON.parse(data.end);
-                        findElement.innerText = "find: ";
-                        responseElement.innerText = `${end.normalizedtitle}`;
-                        responseElement.href = `https://en.wikipedia.org/wiki/${end.title}`;
-                        startBtn.disabled = false;
+                        findElement.innerText = "find: " + `${end.normalizedtitle}`;
+                        startBtn.disabled = true;
                     }
                 });
                 break;
@@ -79,8 +72,6 @@ export function handleGameStep() {
             case GameState.ERROR:
                 console.error('An error occurred!');
                 findElement.innerText = "Error fetching article";
-                responseElement.innerText = "";
-                responseElement.href = "";
                 startBtn.disabled = true;
                 break;
             default:

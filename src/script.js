@@ -5,7 +5,7 @@ const fetchBtn = document.getElementById("fetchBtn");
 const startBtn = document.getElementById("startBtn");
 
 document.addEventListener("DOMContentLoaded", function () {
-
+    chrome.storage.local.clear();
     handleGameStep();
 
     fetchBtn.addEventListener("click", async function () {
@@ -21,26 +21,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
     startBtn.addEventListener("click", async function () {
         let start;
-        if (getGameState(function(step) {return step;}) === GameState.PLAYING) {
-            chrome.storage.local.get('start', function (data) {
-                if (data && data.start) {
-                    start = JSON.parse(data.start);
+        updateGameState(GameState.PLAYING);
+        chrome.storage.local.get('end', function (data) {
+            if (data && data.end) {
+                let end = JSON.parse(data.end);
+                while (start === undefined || start.title === end.title) {
+                    start = getFeaturedArticles();
                 }
-            });
-        } else {
-            updateGameState(GameState.PLAYING);
-            chrome.storage.local.get('end', function (data) {
-                if (data && data.end) {
-                    let end = JSON.parse(data.end);
-                    while (start === undefined || start.title === end.title) {
-                        start = getFeaturedArticles();
-                    }
-                }
-            });
-            start = await getFeaturedArticles();
-            chrome.storage.local.set({ 'start': JSON.stringify(start) });
-        }
-        window.open(`https://en.wikipedia.org/wiki/${start.title}`, "_blank");
+            }
+        });
+        start = await getFeaturedArticles();
+        chrome.storage.local.set({ 'start': JSON.stringify(start) });
+        
+        // Update the current tab with the new URL
+        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+            chrome.tabs.update(tabs[0].id, { url: `https://en.wikipedia.org/wiki/${start.title}` });
+        });
     });
 });
 
