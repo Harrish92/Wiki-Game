@@ -37,6 +37,8 @@ document.addEventListener("DOMContentLoaded", function () {
         chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
             chrome.tabs.update(tabs[0].id, { url: `https://en.wikipedia.org/wiki/${start.title}` });
         });
+
+        handleGameStep();
     });
 });
 
