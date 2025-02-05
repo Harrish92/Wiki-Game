@@ -46,7 +46,7 @@ export function handleGameStep() {
                 chrome.storage.local.get('end', function(data) {
                     if (data && data.end) {
                         let end = JSON.parse(data.end);
-                        findElement.innerText = "find: " + `${end.normalizedtitle}`;
+                        findElement.innerHTML = `find: <strong>${end.normalizedtitle}<strong>`;
                         startBtn.disabled = false;
                     }
                 });
@@ -55,7 +55,7 @@ export function handleGameStep() {
                 chrome.storage.local.get('end', function(data) {
                     if (data && data.end) {
                         let end = JSON.parse(data.end);
-                        findElement.innerText = "find: " + `${end.normalizedtitle}`;
+                        findElement.innerHTML = `find: <strong>${end.normalizedtitle}<strong>`;
                         startBtn.disabled = true;
                     }
                 });
