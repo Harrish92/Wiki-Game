@@ -17,7 +17,7 @@ async function checkTabUrl(tab) {
         chrome.storage.local.get('start', async function(data) {
             if (data && data.start) {
                 let parsedData = JSON.parse(data.start);
-                titleToCheck = parsedData.title;
+                titleToCheck = parsedData.normalizedtitle;
                 matchedTitles.push(titleToCheck);   
             } else {
                 console.log("No data found in local storage.");
@@ -72,14 +72,25 @@ function compareUrls(activeUrl, linkedUrls) {
             gameState = GameState.NEXT;
             updateGameState(gameState);
             console.log("Match found! Title added to the list:", linkedUrl);
+            console.log(matchedTitles)
         }
     });
-    if (gameState !== GameState.NEXT) {
-        gameState = GameState.GAME_OVER;
-        matchedTitles = [];
-        console.log("Game over! No match found.");
-    } else {
-        gameState = GameState.PLAYING;
-    }
-    updateGameState(gameState);
+
+    chrome.storage.local.get('end', function(data) {
+        if (data && data.end) {
+            console.log(JSON.parse(data.end).normalizedtitle);
+            if (matchedTitles[matchedTitles.length - 1] === JSON.parse(data.end).normalizedtitle) {
+                gameState = GameState.WIN;
+                matchedTitles = [];
+                console.log("You won! Game over.");
+            } else if ((gameState !== GameState.NEXT) && (gameState !== GameState.WIN)) {
+                gameState = GameState.GAME_OVER;
+                matchedTitles = [];
+                console.log("Game over! No match found.");
+            } else {
+                gameState = GameState.PLAYING;
+            }
+        }
+        updateGameState(gameState);
+    });
 }

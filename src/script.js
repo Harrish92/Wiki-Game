@@ -29,6 +29,14 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         } else {
             updateGameState(GameState.PLAYING);
+            chrome.storage.local.get('end', function (data) {
+                if (data && data.end) {
+                    let end = JSON.parse(data.end);
+                    while (start === undefined || start.title === end.title) {
+                        start = getFeaturedArticles();
+                    }
+                }
+            });
             start = await getFeaturedArticles();
             chrome.storage.local.set({ 'start': JSON.stringify(start) });
         }
