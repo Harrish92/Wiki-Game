@@ -1,10 +1,5 @@
 import { GameState, updateGameState, getGameState, handleGameStep } from './gameState.js';
 let matchedTitles = [];
-chrome.storage.local.get('matchedTitles', function(data) {
-    if (data && data.matchedTitles) {
-        matchedTitles = JSON.parse(data.matchedTitles);
-    }
-});
 let gameState = getGameState(function(step) {return step;});
 
 chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
@@ -14,27 +9,30 @@ chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
 });
 
 async function checkTabUrl(tab) {
-    let activeUrl = tab.url;
-    let linkedUrls = [];
-    let titleToCheck;
 
-    if (matchedTitles.length === 0) {
-        chrome.storage.local.get('start', async function(data) {
-            if (data && data.start) {
-                let parsedData = JSON.parse(data.start);
-                titleToCheck = parsedData.normalizedtitle;
-                matchedTitles.push(titleToCheck);   
-            } else {
-                console.log("No data found in local storage.");
-            }
-        });
-    } else {
-        titleToCheck = matchedTitles[matchedTitles.length - 1];
-        linkedUrls = await getLinkedUrls(titleToCheck);
-        compareUrls(activeUrl, linkedUrls);    
-    }
+    chrome.storage.local.get('matchedTitles', async function(data) {
+        let activeUrl = tab.url;
+        let linkedUrls = [];
+        let titleToCheck;
 
-    chrome.storage.local.set({ 'matchedTitles': JSON.stringify(matchedTitles) });
+        if (matchedTitles.length === 0) {
+            chrome.storage.local.get('start', async function(data) {
+                if (data && data.start) {
+                    let parsedData = JSON.parse(data.start);
+                    titleToCheck = parsedData.normalizedtitle;
+                    matchedTitles.push(titleToCheck);   
+                } else {
+                    console.log("No data found in local storage.");
+                }
+            });
+        } else {
+            titleToCheck = matchedTitles[matchedTitles.length - 1];
+            linkedUrls = await getLinkedUrls(titleToCheck);
+            compareUrls(activeUrl, linkedUrls);    
+        }
+
+        chrome.storage.local.set({ 'matchedTitles': JSON.stringify(matchedTitles) });
+    });
 }
 
 async function getLinkedUrls(title) {
@@ -73,20 +71,20 @@ async function getLinkedUrls(title) {
 }
 
 function compareUrls(activeUrl, linkedUrls) {
-    gameState = GameState.GAME_OVER;
-    linkedUrls.forEach(linkedUrl => {
-        if (activeUrl === `https://en.wikipedia.org/wiki/${linkedUrl.replace(/ /g, '_')}`) {
-            matchedTitles.push(linkedUrl);
-            gameState = GameState.PLAYING;
-            updateGameState(gameState);
-            console.log("Match found! Title added to the list:", linkedUrl);
-            console.log(matchedTitles)
-        }
-    });
 
     chrome.storage.local.get('end', function(data) {
+        gameState = GameState.GAME_OVER;
+        linkedUrls.forEach(linkedUrl => {
+            if (activeUrl === `https://en.wikipedia.org/wiki/${linkedUrl.replace(/ /g, '_')}`) {
+                matchedTitles.push(linkedUrl);
+                gameState = GameState.PLAYING;
+                updateGameState(gameState);
+                console.log("Match found! Title added to the list:", linkedUrl);
+                console.log(matchedTitles)
+            }
+        });
+
         if (data && data.end) {
-            console.log(JSON.parse(data.end).normalizedtitle);
             if (matchedTitles[matchedTitles.length - 1] === JSON.parse(data.end).normalizedtitle) {
                 gameState = GameState.WIN;
                 matchedTitles = [];
@@ -95,6 +93,7 @@ function compareUrls(activeUrl, linkedUrls) {
                 gameState = GameState.GAME_OVER;
                 matchedTitles = [];
                 console.log("Game over! No match found.");
+                console.log(matchedTitles);
             }
         }
 
