@@ -7,6 +7,8 @@ const startBtn = document.getElementById("startBtn");
 document.addEventListener("DOMContentLoaded", function () {
     handleGameStep();
 
+    // Event listeners for the fetch and start buttons
+
     fetchBtn.addEventListener("click", async function () {
         chrome.storage.local.clear();
         const end = await getFeaturedArticles();
@@ -42,7 +44,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-// Get today's featured article from English Wikipedia
+/**
+ * Fetches today's featured article from English Wikipedia.
+ * @returns {Promise<Object|string>} - The featured article data or an error message.
+ */
 async function getFeaturedArticles() {
 
     let today = new Date();

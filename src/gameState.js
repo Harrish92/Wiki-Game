@@ -1,4 +1,4 @@
-// gameState.js
+// Define the possible game states
 export const GameState = {
     IDLE: 'Idle',
     SELECTION: 'Selection',
@@ -8,7 +8,10 @@ export const GameState = {
     ERROR: 'Error',
 };
 
-// Function to update the game state
+/**
+ * Updates the game state.
+ * @param {string} state - The new game state.
+ */
 export function updateGameState(state) {
     if (Object.values(GameState).includes(state)) {
         chrome.storage.local.set({ 'gameState': state }, function() {
@@ -19,7 +22,10 @@ export function updateGameState(state) {
     }
 }
 
-// Function to retrieve the current game state
+/**
+ * Retrieves the current game state from local storage.
+ * @param {function} callback - The callback function to handle the retrieved state.
+ */
 export function getGameState(callback) {
     chrome.storage.local.get('gameState', function(data) {
         if (data && data.gameState) {

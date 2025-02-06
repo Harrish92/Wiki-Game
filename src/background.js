@@ -2,12 +2,17 @@ import { GameState, updateGameState, getGameState, handleGameStep } from './game
 let matchedTitles = [];
 let gameState = getGameState(function(step) {return step;});
 
+// Listener for when the extension icon is clicked
 chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
     if (changeInfo.status == 'complete') {
         checkTabUrl(tab);
     }
 });
 
+/**
+ * Checks the URL of the active tab and compares it with the linked URLs.
+ * @param {Object} tab - The active tab object.
+ */
 async function checkTabUrl(tab) {
 
     chrome.storage.local.get('matchedTitles', async function(data) {
@@ -35,6 +40,11 @@ async function checkTabUrl(tab) {
     });
 }
 
+/**
+ * Fetches the linked URLs for a given Wikipedia page title.
+ * @param {string} title - The Wikipedia page title.
+ * @returns {Promise<Array<string>>} - A promise that resolves to an array of linked URLs.
+ */
 async function getLinkedUrls(title) {
     let linkedUrls = [];
     let url = `https://en.wikipedia.org/w/api.php?action=query&titles=${title}&prop=links&format=json&pllimit=max`;
@@ -70,6 +80,12 @@ async function getLinkedUrls(title) {
     }
 }
 
+/**
+ * Compares the active URL with the linked URLs and updates the matched titles.
+ * @param {string} activeUrl - The URL of the active tab.
+ * @param {Array<string>} linkedUrls - The array of linked URLs.
+ * @param {string} titleToCheck - The title to check against the linked URLs.
+ */
 function compareUrls(activeUrl, linkedUrls) {
 
     chrome.storage.local.get('end', function(data) {
