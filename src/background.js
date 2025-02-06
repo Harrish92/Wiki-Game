@@ -1,5 +1,10 @@
 import { GameState, updateGameState, getGameState, handleGameStep } from './gameState.js';
 let matchedTitles = [];
+chrome.storage.local.get('matchedTitles', function(data) {
+    if (data && data.matchedTitles) {
+        matchedTitles = JSON.parse(data.matchedTitles);
+    }
+});
 let gameState = getGameState(function(step) {return step;});
 
 chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
@@ -28,6 +33,8 @@ async function checkTabUrl(tab) {
         linkedUrls = await getLinkedUrls(titleToCheck);
         compareUrls(activeUrl, linkedUrls);    
     }
+
+    chrome.storage.local.set({ 'matchedTitles': JSON.stringify(matchedTitles) });
 }
 
 async function getLinkedUrls(title) {
@@ -66,10 +73,11 @@ async function getLinkedUrls(title) {
 }
 
 function compareUrls(activeUrl, linkedUrls) {
+    gameState = GameState.GAME_OVER;
     linkedUrls.forEach(linkedUrl => {
         if (activeUrl === `https://en.wikipedia.org/wiki/${linkedUrl.replace(/ /g, '_')}`) {
             matchedTitles.push(linkedUrl);
-            gameState = GameState.NEXT;
+            gameState = GameState.PLAYING;
             updateGameState(gameState);
             console.log("Match found! Title added to the list:", linkedUrl);
             console.log(matchedTitles)
@@ -83,14 +91,14 @@ function compareUrls(activeUrl, linkedUrls) {
                 gameState = GameState.WIN;
                 matchedTitles = [];
                 console.log("You won! Game over.");
-            } else if ((gameState !== GameState.NEXT) && (gameState !== GameState.WIN)) {
+            } else if ((gameState !== GameState.PLAYING)) {
                 gameState = GameState.GAME_OVER;
                 matchedTitles = [];
                 console.log("Game over! No match found.");
-            } else {
-                gameState = GameState.PLAYING;
             }
         }
+
+        chrome.storage.local.set({ 'matchedTitles': JSON.stringify(matchedTitles) });
         updateGameState(gameState);
     });
 }

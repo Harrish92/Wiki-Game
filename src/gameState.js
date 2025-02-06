@@ -3,7 +3,6 @@ export const GameState = {
     IDLE: 'Idle',
     SELECTION: 'Selection',
     PLAYING: 'Playing',
-    NEXT: 'Next',
     WIN: 'Win',
     GAME_OVER: 'Game Over',
     ERROR: 'Error',
@@ -60,13 +59,16 @@ export function handleGameStep() {
                     }
                 });
                 break;
-            case GameState.NEXT:
-                console.log('Next step...');
-                break;
             case GameState.GAME_OVER:
+                chrome.storage.local.clear();
+                findElement.innerText = "Game over!";
+                startBtn.disabled = true;
                 console.log('Game over!');
                 break;
             case GameState.WIN:
+                chrome.storage.local.clear();
+                findElement.innerText = "You won!";
+                startBtn.disabled = true;
                 console.log('You won!');
                 break;
             case GameState.ERROR:
@@ -75,6 +77,8 @@ export function handleGameStep() {
                 startBtn.disabled = true;
                 break;
             default:
+                findElement.innerText = "An error occured";
+                startBtn.disabled = true;
                 console.error('Unknown game step:', step);
                 break;
         }

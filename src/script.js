@@ -5,10 +5,10 @@ const fetchBtn = document.getElementById("fetchBtn");
 const startBtn = document.getElementById("startBtn");
 
 document.addEventListener("DOMContentLoaded", function () {
-    chrome.storage.local.clear();
     handleGameStep();
 
     fetchBtn.addEventListener("click", async function () {
+        chrome.storage.local.clear();
         const end = await getFeaturedArticles();
         if (end === "Error fetching article") {
             updateGameState(GameState.ERROR);
