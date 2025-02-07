@@ -6,3 +6,5 @@ The game is basic : go from one wikipedia article to the other to find the one t
 The data persistence was the hardest part of the project, as the pop up always closes each time a new window is opened.
 
 The timer could not be implemented, because of the previously mentionned difficulty.
+
+Before using it, run the command `npm run build` .
